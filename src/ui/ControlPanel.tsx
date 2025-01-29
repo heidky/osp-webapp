@@ -2,36 +2,32 @@ import { deviceManager } from '../store'
 import { Component } from 'solid-js'
 
 interface Props {
-    disabled: boolean
+  disabled: boolean
 }
 
 const ControlPanel: Component<Props> = (props) => {
-    const sendVibe = (value: number) => {
-        deviceManager.sendVibe(value)
-    }
+  const sendVibe = (value: number) => {
+    deviceManager.sendVibe(value)
+  }
 
-    return (
-        <div class="flex space-x-4">
-            <button
-                class={`rounded px-4 py-2 ${
-                    props.disabled ? 'bg-gray-500' : 'bg-blue-500'
-                } text-white`}
-                onClick={() => sendVibe(10)}
-                disabled={props.disabled}
-            >
-                10
-            </button>
-            <button
-                class={`rounded px-4 py-2 ${
-                    props.disabled ? 'bg-gray-500' : 'bg-red-500'
-                } text-white`}
-                onClick={() => sendVibe(0)}
-                disabled={props.disabled}
-            >
-                0
-            </button>
-        </div>
-    )
+  return (
+    <div class="flex space-x-4">
+      <button
+        class={`rounded px-4 py-2 ${props.disabled ? 'bg-gray-500' : 'bg-blue-500'} text-white`}
+        onClick={() => sendVibe(10)}
+        disabled={props.disabled}
+      >
+        10
+      </button>
+      <button
+        class={`rounded px-4 py-2 ${props.disabled ? 'bg-gray-500' : 'bg-red-500'} text-white`}
+        onClick={() => sendVibe(0)}
+        disabled={props.disabled}
+      >
+        0
+      </button>
+    </div>
+  )
 }
 
 export default ControlPanel
