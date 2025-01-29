@@ -13,7 +13,7 @@ const ControlPanel: Component<Props> = (props) => {
     return (
         <div class="flex space-x-4">
             <button
-                class={`px-4 py-2 rounded ${
+                class={`rounded px-4 py-2 ${
                     props.disabled ? 'bg-gray-500' : 'bg-blue-500'
                 } text-white`}
                 onClick={() => sendVibe(10)}
@@ -22,7 +22,7 @@ const ControlPanel: Component<Props> = (props) => {
                 10
             </button>
             <button
-                class={`px-4 py-2 rounded ${
+                class={`rounded px-4 py-2 ${
                     props.disabled ? 'bg-gray-500' : 'bg-red-500'
                 } text-white`}
                 onClick={() => sendVibe(0)}

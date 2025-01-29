@@ -7,13 +7,13 @@ interface Props {
 
 const Header: Component<Props> = (props) => {
     return (
-        <header class="bg-blue-500 p-4">
-            <div class="container mx-auto flex justify-between items-center">
-                <h1 class="text-white text-xl">OSP</h1>
+        <header class="p-4">
+            <div class="container mx-auto flex items-center justify-between">
+                <h1 class="text-3xl font-bold tracking-wider text-white">OSP</h1>
                 {props.connected ? (
                     <>
                         <button
-                            class="bg-red-500 text-white px-4 py-2 rounded"
+                            class="rounded bg-red-500 px-4 py-2 text-white"
                             onclick={() => deviceManager.disconnect()}
                         >
                             Disconnect
@@ -22,7 +22,7 @@ const Header: Component<Props> = (props) => {
                     </>
                 ) : (
                     <button
-                        class="bg-white text-blue-500 px-4 py-2 rounded"
+                        class="rounded bg-white px-4 py-2 text-blue-500"
                         onclick={() => deviceManager.connectPrompt()}
                     >
                         Connect
