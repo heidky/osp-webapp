@@ -22,6 +22,7 @@ const App: Component = () => {
       {/* <div class="px-32 py-8">
         <ControlPanel disabled={!connected()} />
       </div> */}
+      <div class="mt-4"></div>
       <AccelerometerControl disabled={!connected()} />
     </>
   )

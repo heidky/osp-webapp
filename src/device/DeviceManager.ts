@@ -146,4 +146,15 @@ export default class DeviceManager {
       await this.tx_characteristic.writeValue(buffer)
     }
   }
+
+  async sendCmd(cmd: string, value: number) {
+    if (this.tx_characteristic) {
+      const valueText = Math.min(100, Math.max(0, value)).toFixed(0)
+      const sendText = cmd + ':' + valueText + ';'
+
+      const encoder = new TextEncoder()
+      const buffer = encoder.encode(sendText)
+      await this.tx_characteristic.writeValue(buffer)
+    }
+  }
 }
