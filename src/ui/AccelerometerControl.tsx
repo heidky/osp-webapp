@@ -54,7 +54,7 @@ class VibeSmoother {
     this._s = 0
   }
 
-  boost = 1
+  boost = 1.6
   decay = 0.98
 
   update(v: number) {
