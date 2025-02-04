@@ -46,7 +46,7 @@ const AccelerometerControl: Component<Props> = ({ disabled }) => {
     if (sendVibe) {
       deviceManager.sendVibe(vibe())
     } else {
-      deviceManager.sendCmd('Grit', grit())
+      deviceManager.sendGrit(grit())
     }
     sendVibe = !sendVibe
   }, 1000 / TX_RATE)

@@ -136,25 +136,22 @@ export default class DeviceManager {
     }
   }
 
-  async sendVibe(value: number) {
+  async sendCmd(cmd: string, valueText: string) {
     if (this.tx_characteristic) {
-      const valueText = Math.min(20, Math.max(0, value)).toFixed(0)
-      const sendText = 'Vibrate:' + valueText + ';'
-
+      const sendText = cmd + ':' + valueText + ';'
       const encoder = new TextEncoder()
       const buffer = encoder.encode(sendText)
       await this.tx_characteristic.writeValue(buffer)
     }
   }
 
-  async sendCmd(cmd: string, value: number) {
-    if (this.tx_characteristic) {
-      const valueText = Math.min(100, Math.max(0, value)).toFixed(0)
-      const sendText = cmd + ':' + valueText + ';'
+  async sendVibe(value: number) {
+    const valueText = Math.min(20, Math.max(0, value)).toFixed(0)
+    this.sendCmd('Vibrate', valueText)
+  }
 
-      const encoder = new TextEncoder()
-      const buffer = encoder.encode(sendText)
-      await this.tx_characteristic.writeValue(buffer)
-    }
+  async sendGrit(value: number) {
+    const valueText = Math.min(100, Math.max(0, value)).toFixed(0)
+    this.sendCmd('Grit', valueText)
   }
 }
