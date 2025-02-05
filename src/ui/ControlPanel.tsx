@@ -15,7 +15,7 @@ const ControlPanel: Component<Props> = (props) => {
   return (
     <div class="flex flex-col">
       <select
-        class="mx-2 mb-8 rounded-md px-2 py-2"
+        class="mx-2 mb-8 rounded-md bg-zinc-600 px-2 py-2 outline-none"
         value={type()}
         on:change={(e) => setType(e.target.value as ControlType)}
       >

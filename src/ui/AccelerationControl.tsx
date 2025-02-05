@@ -1,7 +1,7 @@
 import { Component, createSignal, onCleanup } from 'solid-js'
 import { deviceManager } from '../store'
 import MotionSensor, { Vector3 } from '../device/MotionSensor'
-import { VibeSmoother } from '../device/processing'
+import { Smoother } from '../device/processing'
 import VibeGritGauge from './VibeGritGauge'
 
 interface Props {
@@ -9,7 +9,9 @@ interface Props {
 }
 
 const TX_RATE = 25
+
 const VIBE_MAX = 20
+const GRIT_MAX = 50
 
 const AccelerationControl: Component<Props> = (p) => {
   const [error, setError] = createSignal('')
@@ -18,14 +20,15 @@ const AccelerationControl: Component<Props> = (p) => {
   const [gritEnabled, setGritEnabled] = createSignal(false)
   const [grit, setGrit] = createSignal(0)
 
-  const vibeSmoother = new VibeSmoother()
   const motion = new MotionSensor()
+  const vibeSmoother = new Smoother(MotionSensor.SENSOR_SAMPLE_RATE)
 
   motion.onError = (e) => setError(e.join('\n'))
 
   motion.onAcceleration = (a: Vector3) => {
     if (vibeState() == 'change') {
-      vibeSmoother.update(Math.abs(a.x))
+      const A_SCALE = 100
+      vibeSmoother.update(Math.abs(a.x) / A_SCALE)
       setVibe(Math.round(vibeSmoother.value * VIBE_MAX))
     } else if (vibeState() == 'off') {
       vibeSmoother.value = 0
@@ -66,24 +69,23 @@ const AccelerationControl: Component<Props> = (p) => {
 
       <div class="mt-32 flex flex-col items-stretch justify-between gap-y-8">
         <button
-          class={`h-32 flex-grow select-none rounded bg-gray-600 py-2 font-bold text-gray-500`}
+          class={`h-32 flex-grow touch-none select-none rounded bg-gray-600 py-2 font-bold text-gray-500`}
           onTouchStart={() => setVibeState('change')}
           onTouchEnd={() => setVibeState((s) => (s == 'off' ? 'off' : 'hold'))}
           onTouchCancel={() => setVibeState((s) => (s == 'off' ? 'off' : 'hold'))}
+          onClick={() => setVibeState('off')}
           disabled={error().length > 0}
         >
           Touch to Control Vibe
         </button>
 
-        <div class="flex-grow"></div>
-
-        <button
+        {/* <button
           disabled={vibeState() == 'off' || error().length > 0}
           class={`h-16 flex-grow select-none rounded bg-red-800 py-2 font-bold text-red-300 disabled:bg-gray-600 disabled:text-gray-500`}
           onClick={() => setVibeState('off')}
         >
           KILL VIBE
-        </button>
+        </button> */}
       </div>
       <div class="my-5 text-red-500">{error()}</div>
     </div>
@@ -98,7 +100,6 @@ function mapClamped(value: number, start1: number, stop1: number, start2: number
 }
 
 function pitchToGrit(pitch: number) {
-  const GRIT_MAX = 50
   const ANGLE_MAX = 90
   const ANGLE_DEADZONE = 0
 

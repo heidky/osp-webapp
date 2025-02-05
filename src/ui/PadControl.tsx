@@ -1,21 +1,26 @@
 import { Component, createEffect, createSignal, onCleanup } from 'solid-js'
 import VibeGritGauge, { VibeState } from './VibeGritGauge'
 import { deviceManager } from '../store'
-import { VibeSmoother } from '../device/processing'
+import { Smoother } from '../device/processing'
 
+const UPDATE_RATE = 50
 const TX_RATE = 25
+
+const VIBE_MAX = 20
+const GRIT_MAX = 50
 
 const PadControl: Component = () => {
   const [vibeState, setVibeState] = createSignal<VibeState>('off')
   const [vibe, setVibe] = createSignal(0)
-  const [gritOn, setGritOn] = createSignal(false)
+  const [gritEnabled, setGritEnabled] = createSignal(false)
   const [grit, setGrit] = createSignal(0)
 
-  let vibeSmoother = new VibeSmoother()
+  const vibeSmoother = new Smoother(UPDATE_RATE)
+  vibeSmoother.boost = 2
 
   let sendVibe = true
 
-  const interval = setInterval(() => {
+  const intervalSend = setInterval(() => {
     if (sendVibe) {
       deviceManager.sendVibe(vibe())
     } else {
@@ -24,74 +29,70 @@ const PadControl: Component = () => {
     sendVibe = !sendVibe
   }, 1000 / TX_RATE)
 
-  onCleanup(() => clearInterval(interval))
+  onCleanup(() => clearInterval(intervalSend))
 
   let time: number | null = null
   let px = 0
   let py = 0
   let px_prev = 0
   let py_prev = 0
-  let vx_prev = 0
-  let vy_prev = 0
+  let vx = 0
+  let vy = 0
 
   let angle_prev = 0
-  const angle_beta = 0.1 / 2
+  const EXP_BETA_ANGLE = 0.1 / 2
 
   const onTouchMove = (e: TouchEvent) => {
     px = e.touches[0].clientX
     py = e.touches[0].clientY
+    e.preventDefault()
   }
 
-  const interval2 = setInterval(() => {
+  const interval = setInterval(() => {
     const now = Date.now()
     if (time) {
       const dt = (now - time) / 1000
-      //   console.log(dt, x, y)
-      let vx = (px - px_prev) / dt
-      let vy = (py - py_prev) / dt
-      // let ax = (vx - vx_prev) / dt
-      // let ay = (vy - vy_prev) / dt
 
-      if (gritOn() && vx * vx + vy * vy > 10) {
+      vx = (px - px_prev) / dt
+      vy = (py - py_prev) / dt
+
+      const V_MAG_STATIC = 10
+      if (gritEnabled() && vx * vx + vy * vy > V_MAG_STATIC) {
         const angle = Math.atan(Math.abs(vy / (vx + 0.001))) / (Math.PI / 2)
-        angle_prev = angle * angle_beta + angle_prev * (1 - angle_beta)
-        setGrit(Math.round(angle_prev * 50))
+        angle_prev = angle * EXP_BETA_ANGLE + angle_prev * (1 - EXP_BETA_ANGLE)
+        setGrit(Math.round(angle_prev * GRIT_MAX))
       }
-
-      // console.log(angle_prev.toFixed(3))
-
-      vx_prev = vx
-      vy_prev = vy
     }
     time = now
     px_prev = px
     py_prev = py
 
     if (vibeState() == 'change') {
-      const v_mag = Math.sqrt(vx_prev * vx_prev + vy_prev * vy_prev)
-      const vibe_norm = vibeSmoother.update((v_mag / 1000) * 0.5)
-      setVibe(Math.round(vibe_norm * 20))
+      const PIXEL_SCALE = 500 * 1000
+      const v_mag = Math.sqrt(vx * vx + vy * vy)
+      const vibe_norm = vibeSmoother.update(v_mag / PIXEL_SCALE)
+      setVibe(Math.round(vibe_norm * VIBE_MAX))
     } else if (vibeState() == 'off') {
       vibeSmoother.value = 0
       setVibe(0)
     }
-  }, 1000 / 60)
-  onCleanup(() => clearInterval(interval2))
+  }, 1000 / UPDATE_RATE)
+  onCleanup(() => clearInterval(interval))
 
-  createEffect(() => !gritOn() && setGrit(0))
+  createEffect(() => !gritEnabled() && setGrit(0))
 
   return (
     <div class="flex flex-col px-2">
       <VibeGritGauge
         vibeState={vibeState()}
         vibeValue={vibe()}
-        gritEnabled={gritOn()}
+        gritEnabled={gritEnabled()}
         gritValue={grit()}
-        onGritEnabled={(b) => setGritOn(b)}
+        onGritEnabled={(b) => setGritEnabled(b)}
       />
 
       <div
-        class="mt-8 h-64 rounded-md border border-slate-900 bg-zinc-700"
+        class="mt-8 h-64 touch-none select-none rounded-md border border-slate-900 bg-zinc-700"
         onTouchStart={() => setVibeState('change')}
         onTouchEnd={() => setVibeState('hold')}
         onTouchCancel={() => setVibeState('hold')}

@@ -146,11 +146,13 @@ export default class DeviceManager {
   }
 
   async sendVibe(value: number) {
+    if (value < 0 || value > 20) return
     const valueText = Math.min(20, Math.max(0, value)).toFixed(0)
     this.sendCmd('Vibrate', valueText)
   }
 
   async sendGrit(value: number) {
+    if (value < 0 || value > 100) return
     const valueText = Math.min(100, Math.max(0, value)).toFixed(0)
     this.sendCmd('Grit', valueText)
   }
