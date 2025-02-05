@@ -42,10 +42,16 @@ interface Props {
 }
 
 const Header: Component<Props> = (props) => {
+  const goFullscreen = () => {
+    document.querySelector('#root').requestFullscreen()
+  }
+
   return (
-    <header class="flex flex-row items-center justify-between p-4">
+    <header class="flex select-none flex-row items-center justify-between p-4">
       <div class="container mx-auto flex items-center justify-between">
-        <h1 class="text-3xl font-bold tracking-wider text-white">OSP</h1>
+        <h1 class="text-3xl font-bold tracking-wider text-white" onClick={goFullscreen}>
+          OSP
+        </h1>
 
         <Show
           when={props.connected || props.reconnection}

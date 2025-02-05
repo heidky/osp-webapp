@@ -2,6 +2,7 @@ import { Component, createEffect, createSignal, onCleanup } from 'solid-js'
 import VibeGritGauge, { VibeState } from './VibeGritGauge'
 import { deviceManager } from '../store'
 import { Smoother } from '../device/processing'
+import DiscreteSlider from './common/DiscreteSlider'
 
 const UPDATE_RATE = 50
 const TX_RATE = 25
@@ -16,7 +17,12 @@ const PadControl: Component = () => {
   const [grit, setGrit] = createSignal(0)
 
   const vibeSmoother = new Smoother(UPDATE_RATE)
-  vibeSmoother.boost = 2
+
+  const [boost, setBoost] = createSignal(2.0)
+  createEffect(() => (vibeSmoother.boost = boost()))
+
+  const [decay, setDecay] = createSignal(0.01)
+  createEffect(() => (vibeSmoother.decay = decay()))
 
   let sendVibe = true
 
@@ -82,7 +88,7 @@ const PadControl: Component = () => {
   createEffect(() => !gritEnabled() && setGrit(0))
 
   return (
-    <div class="flex flex-col px-2">
+    <div class="mb-6 flex flex-grow flex-col px-2">
       <VibeGritGauge
         vibeState={vibeState()}
         vibeValue={vibe()}
@@ -107,6 +113,24 @@ const PadControl: Component = () => {
       >
         KILL VIBE
       </button> */}
+
+      <div class="flex-grow" />
+
+      <div class="ms-2 mt-8 flex flex-col gap-y-4">
+        <DiscreteSlider
+          title="Boost"
+          value={boost()}
+          onChange={(b) => setBoost(b)}
+          choices={[1.4, 1.6, 1.8, 2.0, 2.2, 2.4, 2.6]}
+        />
+
+        <DiscreteSlider
+          title="Decay"
+          value={decay() * 100}
+          onChange={(d) => setDecay(d / 100)}
+          choices={[0.1, 0.3, 0.6, 1.0, 2.0, 3.0, 4.0].map((n) => n.toFixed(1))}
+        />
+      </div>
     </div>
   )
 }

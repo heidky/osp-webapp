@@ -16,11 +16,8 @@ const App: Component = () => {
   })
 
   return (
-    <div class="container flex h-full flex-col">
+    <div class="container flex min-h-svh flex-col">
       <Header connected={connected()} reconnection={reconnection()} />
-      {/* <div class="px-32 py-8">
-        <ControlPanel disabled={!connected()} />
-      </div> */}
       <div class="mt-4"></div>
       <ControlPanel disabled={!connected()} />
     </div>
