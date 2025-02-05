@@ -60,11 +60,7 @@ const Header: Component<Props> = (props) => {
               {deviceManager.deviceName || 'No Device'}
             </span>
 
-            <SettingsButton
-              onClick={() => {
-                deviceManager.disconnect()
-              }}
-            />
+            <SettingsButton onClick={() => deviceManager.disconnect()} />
           </div>
         </Show>
       </div>

@@ -91,7 +91,7 @@ const PadControl: Component = () => {
       />
 
       <div
-        class="mt-8 h-64 rounded-md border border-slate-900 bg-zinc-600"
+        class="mt-8 h-64 rounded-md border border-slate-900 bg-zinc-700"
         onTouchStart={() => setVibeState('change')}
         onTouchEnd={() => setVibeState('hold')}
         onTouchCancel={() => setVibeState('hold')}
