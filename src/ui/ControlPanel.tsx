@@ -1,31 +1,37 @@
 import { deviceManager } from '../store'
-import { Component } from 'solid-js'
+import { Component, createSignal, Match, Switch } from 'solid-js'
+import AccelerationControl from './AccelerationControl'
+import PadControl from './PadControl'
 
 interface Props {
   disabled: boolean
 }
 
+export type ControlType = 'acceleration' | 'pad'
+
 const ControlPanel: Component<Props> = (props) => {
-  const sendVibe = (value: number) => {
-    deviceManager.sendVibe(value)
-  }
+  const [type, setType] = createSignal<ControlType>('pad')
 
   return (
-    <div class="flex space-x-4">
-      <button
-        class={`rounded px-4 py-2 ${props.disabled ? 'bg-gray-500' : 'bg-blue-500'} text-white`}
-        onClick={() => sendVibe(10)}
-        disabled={props.disabled}
+    <div class="flex flex-col">
+      <select
+        class="mx-2 mb-8 rounded-md px-2 py-2"
+        value={type()}
+        on:change={(e) => setType(e.target.value as ControlType)}
       >
-        10
-      </button>
-      <button
-        class={`rounded px-4 py-2 ${props.disabled ? 'bg-gray-500' : 'bg-red-500'} text-white`}
-        onClick={() => sendVibe(0)}
-        disabled={props.disabled}
-      >
-        0
-      </button>
+        <option value="pad">Pad</option>
+        <option value="acceleration">Acceleration</option>
+      </select>
+
+      <Switch>
+        <Match when={type() == 'acceleration'}>
+          <AccelerationControl />
+        </Match>
+
+        <Match when={type() == 'pad'}>
+          <PadControl />
+        </Match>
+      </Switch>
     </div>
   )
 }

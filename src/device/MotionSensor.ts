@@ -82,8 +82,8 @@ class MotionSensor {
   }
 
   async stop() {
-    this.accelerationSensor.stop()
-    this.orientationSensor.stop()
+    this.accelerationSensor?.stop()
+    this.orientationSensor?.stop()
     this.accelerationSensor = null
     this.orientationSensor = null
     this.acceleration = { x: 0, y: 0, z: 0 }
